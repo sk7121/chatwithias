@@ -175,7 +175,7 @@ export default function ChatPage({ user, onLogout }) {
     });
 
     return (
-        <div className="h-screen flex flex-col lg:flex-row bg-slate-950 text-slate-100">
+        <div className="h-[100dvh] flex flex-col lg:flex-row bg-slate-950 text-slate-100">
             {/* Sidebar for large screens or overlay on mobile when open */}
             <div className={`${sidebarOpen ? "fixed inset-0 z-50" : "hidden"} lg:block`}>
                 {sidebarOpen && (
@@ -202,7 +202,7 @@ export default function ChatPage({ user, onLogout }) {
                 </div>
             </div>
 
-            <div className="flex-1 min-h-0 flex flex-col bg-slate-900">
+            <div className="flex-1 min-h-0 flex flex-col bg-slate-900 overflow-hidden">
                 <ChatHeader user={user} selectedUser={selectedUser} isConnected={isConnected} toggleSidebar={() => setSidebarOpen((s) => !s)} />
 
                 {error ? (
