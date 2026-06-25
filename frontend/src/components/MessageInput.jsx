@@ -1,29 +1,33 @@
 import { SendHorizontal } from "lucide-react";
 
-export default function MessageInput({ value, onChange, onSend, disabled }) {
+export default function MessageInput({
+    value,
+    onChange,
+    onSend,
+    disabled,
+}) {
     return (
-        <div className="bg-slate-950 border-t border-slate-800 p-5">
+        <div className="shrink-0 bg-slate-950 border-t border-slate-800 p-4">
             <div className="flex gap-3">
                 <input
                     type="text"
                     value={value}
-                    onChange={(event) => onChange(event.target.value)}
-                    onKeyDown={(event) => {
-                        if (event.key === "Enter") {
-                            event.preventDefault();
+                    onChange={(e) => onChange(e.target.value)}
+                    onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                            e.preventDefault();
                             onSend();
                         }
                     }}
                     placeholder="Type a message..."
-                    className="flex-1 bg-slate-900 border border-slate-800 rounded-3xl px-5 py-3 text-slate-100 outline-none focus:border-blue-500"
                     disabled={disabled}
+                    className="flex-1 rounded-full bg-slate-900 border border-slate-800 px-4 py-3 outline-none focus:border-blue-500"
                 />
 
                 <button
-                    type="button"
                     onClick={onSend}
                     disabled={disabled}
-                    className="rounded-3xl bg-blue-600 px-5 py-3 text-white transition hover:bg-blue-500 disabled:cursor-not-allowed disabled:opacity-60"
+                    className="bg-blue-600 hover:bg-blue-500 rounded-full p-3 disabled:opacity-50"
                 >
                     <SendHorizontal size={20} />
                 </button>

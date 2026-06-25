@@ -15,7 +15,7 @@ export default function Sidebar({
     loading,
 }) {
     return (
-        <div className="lg:w-96 w-full bg-slate-950 border-r border-slate-800 flex flex-col">
+        <div className="lg:w-96 w-full h-full bg-slate-950 border-r border-slate-800 flex flex-col overflow-hidden">
             <div className="p-5 border-b border-slate-800 flex items-center justify-between gap-4">
                 <div>
                     <h1 className="text-2xl font-semibold tracking-tight">IAS-ChatHub</h1>
@@ -70,7 +70,7 @@ export default function Sidebar({
                 </div>
             </div>
 
-            <div className="flex-1 overflow-y-auto space-y-1 px-2 py-3">
+            <div className="flex-1 overflow-y-auto px-2 py-3">
                 {conversations.length === 0 ? (
                     <div className="text-slate-500 px-4 py-3">No recent conversations yet.</div>
                 ) : (

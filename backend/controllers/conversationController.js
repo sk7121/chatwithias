@@ -9,7 +9,7 @@ exports.createConversation = async (req, res) => {
       participants: {
         $all: [senderId, receiverId],
       },
-    });
+    }).populate("participants", "username email avatar isOnline");
 
     if (conversation) {
       return res.json(conversation);
@@ -18,6 +18,11 @@ exports.createConversation = async (req, res) => {
     conversation = await Conversation.create({
       participants: [senderId, receiverId],
     });
+
+    conversation = await Conversation.findById(conversation._id).populate(
+      "participants",
+      "username email avatar isOnline",
+    );
 
     res.status(201).json(conversation);
   } catch (error) {

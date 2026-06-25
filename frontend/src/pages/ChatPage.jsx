@@ -120,20 +120,21 @@ export default function ChatPage({ user, onLogout }) {
             });
 
             const existing = conversations.find(
-                (conversation) => conversation._id === response.data._id,
+                (conversation) => conversation._id === response.data._id
             );
 
-            setSelectedConversation(response.data);
-            setSelectedUser(contact);
-
-            if (!existing) {
+            if (existing) {
+                setSelectedConversation(existing);
+            } else {
                 setConversations((prev) => [response.data, ...prev]);
+                setSelectedConversation(response.data);
             }
+
+            setSelectedUser(contact);
         } catch (err) {
             setError(err.response?.data?.message || "Unable to open chat.");
         } finally {
             setLoading(false);
-            // close sidebar on mobile after starting a new conversation
             setSidebarOpen(false);
         }
     };
@@ -175,48 +176,72 @@ export default function ChatPage({ user, onLogout }) {
     });
 
     return (
-        <div className="h-[100dvh] flex flex-col lg:flex-row bg-slate-950 text-slate-100">
-            {/* Sidebar for large screens or overlay on mobile when open */}
-            <div className={`${sidebarOpen ? "fixed inset-0 z-50" : "hidden"} lg:block`}>
+        <div className="h-screen md:h-[100dvh] flex lg:flex-row overflow-hidden">
+            {/* Sidebar */}
+            <div
+                className={`${sidebarOpen ? "fixed inset-0 z-50" : "hidden"
+                    } lg:relative lg:block lg:w-96`}
+            >
                 {sidebarOpen && (
-                    <div className="absolute inset-0 bg-black/40 lg:hidden" onClick={() => setSidebarOpen(false)} />
+                    <div
+                        className="absolute inset-0 bg-black/40 lg:hidden"
+                        onClick={() => setSidebarOpen(false)}
+                    />
                 )}
 
-                <div className="relative h-full">
-                    <div className="lg:relative lg:block lg:w-96 w-80 h-full">
-                        <Sidebar
-                            currentUser={user}
-                            conversations={visibleConversations}
-                            users={visibleUsers}
-                            selectedConversation={selectedConversation}
-                            selectedUser={selectedUser}
-                            onConversationSelect={handleSelectConversation}
-                            onUserSelect={handleStartConversation}
-                            onLogout={onLogout}
-                            onClose={() => setSidebarOpen(false)}
-                            searchQuery={searchQuery}
-                            onSearchChange={setSearchQuery}
-                            loading={loading}
-                        />
-                    </div>
+                <div className="relative w-80 lg:w-full h-full">
+                    <Sidebar
+                        currentUser={user}
+                        conversations={visibleConversations}
+                        users={visibleUsers}
+                        selectedConversation={selectedConversation}
+                        selectedUser={selectedUser}
+                        onConversationSelect={handleSelectConversation}
+                        onUserSelect={handleStartConversation}
+                        onLogout={onLogout}
+                        onClose={() => setSidebarOpen(false)}
+                        searchQuery={searchQuery}
+                        onSearchChange={setSearchQuery}
+                        loading={loading}
+                    />
                 </div>
             </div>
 
-            <div className="flex-1 min-h-0 flex flex-col bg-slate-900 overflow-hidden">
-                <ChatHeader user={user} selectedUser={selectedUser} isConnected={isConnected} toggleSidebar={() => setSidebarOpen((s) => !s)} />
+            {/* Chat Area */}
+            <div className="flex-1 flex flex-col min-h-0 overflow-hidden bg-slate-900">
+                {/* Header */}
+                <div className="shrink-0">
+                    <ChatHeader
+                        user={user}
+                        selectedUser={selectedUser}
+                        isConnected={isConnected}
+                        toggleSidebar={() => setSidebarOpen((s) => !s)}
+                    />
+                </div>
 
-                {error ? (
-                    <div className="p-6 text-red-300">{error}</div>
-                ) : null}
+                {error && (
+                    <div className="shrink-0 p-4 text-red-300">
+                        {error}
+                    </div>
+                )}
 
-                <MessageList messages={messages} currentUser={user} />
+                {/* Messages */}
+                <div className="flex-1 min-h-0 overflow-y-auto">
+                    <MessageList
+                        messages={messages}
+                        currentUser={user}
+                    />
+                </div>
 
-                <MessageInput
-                    value={draft}
-                    onChange={setDraft}
-                    onSend={handleSendMessage}
-                    disabled={!selectedConversation || loading}
-                />
+                {/* Input */}
+                <div className="shrink-0">
+                    <MessageInput
+                        value={draft}
+                        onChange={setDraft}
+                        onSend={handleSendMessage}
+                        disabled={!selectedConversation || loading}
+                    />
+                </div>
             </div>
         </div>
     );
