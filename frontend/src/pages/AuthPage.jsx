@@ -33,7 +33,7 @@ export default function AuthPage({ onLogin }) {
                 <div className="mb-8 text-center">
                     <h1 className="text-3xl font-semibold">{isRegister ? "Create account" : "Welcome back"}</h1>
                     <p className="mt-2 text-slate-400">{isRegister ? "Register and start chatting" : "Login to continue your conversations"}</p>
-                </div>
+                </div>  
 
                 <form onSubmit={handleSubmit} className="space-y-5">
                     {isRegister && (

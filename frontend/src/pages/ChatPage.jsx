@@ -176,7 +176,7 @@ export default function ChatPage({ user, onLogout }) {
     });
 
     return (
-        <div className="h-screen md:h-[100dvh] flex lg:flex-row overflow-hidden">
+        <div className="h-dvh flex lg:flex-row overflow-hidden">
             {/* Sidebar */}
             <div
                 className={`${sidebarOpen ? "fixed inset-0 z-50" : "hidden"
