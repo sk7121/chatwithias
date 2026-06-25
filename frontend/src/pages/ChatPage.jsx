@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import Sidebar from "../components/Sidebar";
 import ChatHeader from "../components/ChatHeader";
 import MessageList from "../components/MessageList";
@@ -18,6 +18,30 @@ export default function ChatPage({ user, onLogout }) {
     const [error, setError] = useState("");
     const [isConnected, setIsConnected] = useState(socket.connected);
     const [sidebarOpen, setSidebarOpen] = useState(false);
+    const inputRef = useRef(null);
+
+    useEffect(() => {
+        if (!window.visualViewport) return;
+
+        const update = () => {
+            if (!inputRef.current) return;
+
+            const viewport = window.visualViewport;
+            const keyboardHeight =
+                window.innerHeight - viewport.height - viewport.offsetTop;
+
+            inputRef.current.style.paddingBottom =
+                keyboardHeight > 0 ? `${keyboardHeight}px` : "0px";
+        };
+
+        window.visualViewport.addEventListener("resize", update);
+        window.visualViewport.addEventListener("scroll", update);
+
+        return () => {
+            window.visualViewport.removeEventListener("resize", update);
+            window.visualViewport.removeEventListener("scroll", update);
+        };
+    }, []);
 
     useEffect(() => {
         fetchUsers();
@@ -226,7 +250,7 @@ export default function ChatPage({ user, onLogout }) {
                 )}
 
                 {/* Messages */}
-                <div className="flex-1 min-h-0 overflow-y-auto">
+                <div className="flex-1 min-h-0 overflow-y-auto" style={{ overflowAnchor: "none", }}>
                     <MessageList
                         messages={messages}
                         currentUser={user}
@@ -234,7 +258,10 @@ export default function ChatPage({ user, onLogout }) {
                 </div>
 
                 {/* Input */}
-                <div className="shrink-0">
+                <div
+                    ref={inputRef}
+                    className="shrink-0 bg-slate-950 transition-all duration-200"
+                >
                     <MessageInput
                         value={draft}
                         onChange={setDraft}
@@ -243,6 +270,6 @@ export default function ChatPage({ user, onLogout }) {
                     />
                 </div>
             </div>
-        </div>
+        </div >
     );
 }

@@ -1,4 +1,5 @@
 import { SendHorizontal } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 
 export default function MessageInput({
     value,
@@ -6,6 +7,7 @@ export default function MessageInput({
     onSend,
     disabled,
 }) {
+
     return (
         <div className="shrink-0 bg-slate-950 border-t border-slate-800 p-4">
             <div className="flex gap-3">
