@@ -1,7 +1,6 @@
 import { Menu } from "lucide-react";
 
 export default function ChatHeader({
-    user,
     selectedUser,
     isConnected,
     toggleSidebar,
@@ -17,7 +16,7 @@ export default function ChatHeader({
         : "Choose a contact to start messaging";
 
     return (
-        <header className="sticky top-0 z-30 shrink-0 h-16 bg-slate-950 border-b border-slate-800 px-4 flex items-center justify-between">
+        <header className="h-16 shrink-0 bg-slate-950 border-b border-slate-800 px-4 flex items-center justify-between">
             <div className="flex items-center gap-3 min-w-0">
                 <button
                     onClick={toggleSidebar}

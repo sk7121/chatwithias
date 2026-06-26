@@ -1,5 +1,5 @@
 import { SendHorizontal } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useRef } from "react";
 
 export default function MessageInput({
     value,
@@ -7,7 +7,6 @@ export default function MessageInput({
     onSend,
     disabled,
 }) {
-
     const inputRef = useRef(null);
 
     const handleSend = async () => {
@@ -21,12 +20,15 @@ export default function MessageInput({
     };
 
     return (
-        <div className="shrink-0 bg-slate-950 border-t border-slate-800 p-4">
-            <div className="flex gap-3">
+        <div className="shrink-0 border-t border-slate-800 bg-slate-950 p-4">
+            <div className="flex items-center gap-3">
                 <input
                     ref={inputRef}
                     type="text"
                     value={value}
+                    autoComplete="off"
+                    placeholder="Type a message..."
+                    disabled={disabled}
                     onChange={(e) => onChange(e.target.value)}
                     onKeyDown={(e) => {
                         if (e.key === "Enter") {
@@ -34,17 +36,15 @@ export default function MessageInput({
                             handleSend();
                         }
                     }}
-                    placeholder="Type a message..."
-                    disabled={disabled}
-                    className="flex-1 rounded-full bg-slate-900 border border-slate-800 px-4 py-3 outline-none focus:border-blue-500"
+                    className="flex-1 rounded-full border border-slate-800 bg-slate-900 px-4 py-3 text-white outline-none transition-colors focus:border-blue-500 disabled:cursor-not-allowed disabled:opacity-60"
                 />
 
                 <button
+                    type="button"
                     onMouseDown={(e) => e.preventDefault()}
-                    onTouchStart={(e) => e.preventDefault()}
                     onClick={handleSend}
                     disabled={disabled}
-                    className="bg-blue-600 hover:bg-blue-500 rounded-full p-3 disabled:opacity-50"
+                    className="rounded-full bg-blue-600 p-3 text-white transition-colors hover:bg-blue-500 disabled:cursor-not-allowed disabled:opacity-50"
                 >
                     <SendHorizontal size={20} />
                 </button>

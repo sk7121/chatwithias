@@ -55,18 +55,36 @@ export default function ChatPage({ user, onLogout }) {
 
         const handleNewMessage = (data) => {
             if (data.conversationId !== selectedConversation?._id) {
-                setConversations((prev) => {
-                    return prev.map((conversation) => {
-                        if (conversation._id === data.conversationId) {
-                            return { ...conversation, lastMessage: data.message.text };
-                        }
-                        return conversation;
-                    });
-                });
+                setConversations((prev) =>
+                    prev.map((conversation) =>
+                        conversation._id === data.conversationId
+                            ? { ...conversation, lastMessage: data.message.text }
+                            : conversation
+                    )
+                );
                 return;
             }
 
-            setMessages((prev) => [...prev, data.message]);
+            setMessages((prev) => {
+                const pendingIndex = prev.findIndex(
+                    (msg) =>
+                        msg.pending &&
+                        msg.text === data.message.text &&
+                        (msg.sender === user._id || msg.sender?._id === user._id)
+                );
+
+                if (pendingIndex !== -1) {
+                    const updated = [...prev];
+                    updated[pendingIndex] = data.message;
+                    return updated;
+                }
+
+                if (prev.some((msg) => msg._id === data.message._id)) {
+                    return prev;
+                }
+
+                return [...prev, data.message];
+            });
         };
 
         socket.on("newMessage", handleNewMessage);
@@ -166,24 +184,44 @@ export default function ChatPage({ user, onLogout }) {
     const handleSendMessage = async () => {
         if (!draft.trim() || !selectedConversation) return;
 
+        const tempMessage = {
+            _id: `temp-${Date.now()}`,
+            text: draft,
+            sender: user._id,
+            createdAt: new Date().toISOString(),
+            pending: true,
+        };
+
+        // Save text before clearing input
+        const messageText = draft;
+
+        // Clear input immediately
+        setDraft("");
+
+        // Show instantly
+        setMessages((prev) => [...prev, tempMessage]);
+
+        // Update conversation preview instantly
+        setConversations((prev) =>
+            prev.map((conversation) =>
+                conversation._id === selectedConversation._id
+                    ? { ...conversation, lastMessage: messageText }
+                    : conversation
+            )
+        );
+
         try {
-            const response = await api.post("/messages", {
+            await api.post("/messages", {
                 conversationId: selectedConversation._id,
                 receiverId: selectedUser?._id,
-                text: draft.trim(),
+                text: messageText,
             });
-
-            setMessages((prev) => [...prev, response.data]);
-            setDraft("");
-
-            setConversations((prev) =>
-                prev.map((conversation) =>
-                    conversation._id === selectedConversation._id
-                        ? { ...conversation, lastMessage: response.data.text }
-                        : conversation,
-                ),
-            );
         } catch (err) {
+            // Remove failed message
+            setMessages((prev) =>
+                prev.filter((msg) => msg._id !== tempMessage._id)
+            );
+
             setError(err.response?.data?.message || "Unable to send message.");
         }
     };
@@ -198,6 +236,8 @@ export default function ChatPage({ user, onLogout }) {
         );
         return other?.username.toLowerCase().includes(searchQuery.toLowerCase());
     });
+
+    const [keyboardOpen, setKeyboardOpen] = useState(false);
 
     return (
         <div className="h-dvh flex lg:flex-row overflow-hidden">
@@ -233,42 +273,33 @@ export default function ChatPage({ user, onLogout }) {
 
             {/* Chat Area */}
             <div className="flex-1 flex flex-col min-h-0 overflow-hidden bg-slate-900">
-                {/* Header */}
-                <div className="shrink-0">
-                    <ChatHeader
-                        user={user}
-                        selectedUser={selectedUser}
-                        isConnected={isConnected}
-                        toggleSidebar={() => setSidebarOpen((s) => !s)}
-                    />
-                </div>
 
-                {error && (
-                    <div className="shrink-0 p-4 text-red-300">
-                        {error}
+                <div className="flex-1 overflow-y-auto">
+                    <div
+                        className={`transition-all duration-300 overflow-hidden ${keyboardOpen ? "max-h-0 opacity-0" : "max-h-20 opacity-100"
+                            }`}
+                    >
+                        <ChatHeader
+                            user={user}
+                            selectedUser={selectedUser}
+                            isConnected={isConnected}
+                            toggleSidebar={() => setSidebarOpen((s) => !s)}
+                        />
                     </div>
-                )}
-
-                {/* Messages */}
-                <div className="flex-1 min-h-0 overflow-y-auto" style={{ overflowAnchor: "none", }}>
                     <MessageList
                         messages={messages}
                         currentUser={user}
                     />
+
                 </div>
 
-                {/* Input */}
-                <div
-                    ref={inputRef}
-                    className="shrink-0 bg-slate-950 transition-all duration-200"
-                >
-                    <MessageInput
-                        value={draft}
-                        onChange={setDraft}
-                        onSend={handleSendMessage}
-                        disabled={!selectedConversation || loading}
-                    />
-                </div>
+                <MessageInput
+                    value={draft}
+                    onChange={setDraft}
+                    onSend={handleSendMessage}
+                    disabled={!selectedConversation || loading}
+                    keyboardOpen={keyboardOpen}
+                />
             </div>
         </div >
     );
