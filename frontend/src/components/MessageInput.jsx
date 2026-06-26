@@ -40,6 +40,8 @@ export default function MessageInput({
                 />
 
                 <button
+                    onMouseDown={(e) => e.preventDefault()}
+                    onTouchStart={(e) => e.preventDefault()}
                     onClick={handleSend}
                     disabled={disabled}
                     className="bg-blue-600 hover:bg-blue-500 rounded-full p-3 disabled:opacity-50"
