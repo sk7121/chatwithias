@@ -211,13 +211,24 @@ export default function ChatPage({ user, onLogout }) {
         );
 
         try {
-            await api.post("/messages", {
+            const response = await api.post("/messages", {
                 conversationId: selectedConversation._id,
                 receiverId: selectedUser?._id,
                 text: messageText,
             });
+
+            // Replace pending message with the saved message
+            setMessages((prev) =>
+                prev.map((msg) =>
+                    msg._id === tempMessage._id
+                        ? {
+                            ...response.data,
+                            pending: false,
+                        }
+                        : msg
+                )
+            );
         } catch (err) {
-            // Remove failed message
             setMessages((prev) =>
                 prev.filter((msg) => msg._id !== tempMessage._id)
             );
